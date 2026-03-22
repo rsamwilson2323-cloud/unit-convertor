@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unit Converter</title>
+
+<style>
+:root {
+  --bg1: #00eaff;
+  --bg2: #0061ff;
+  --text: #1b1b1f;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  display: flex;
+  justify-content: center;
+}
+
+.app {
+  width: 100%;
+  max-width: 1100px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(14px);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h2 { color:white; margin:0; }
+
+/* Toggle Button */
+.toggle {
+  width: 90px;
+  height: 38px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 50px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+}
+
+.knob {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.25s ease;
+}
+
+.grid {
+  margin-top: 20px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: rgba(255,255,255,0.28);
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.3);
+  backdrop-filter: blur(8px);
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+  font-size: 15px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,0.92);
+}
+
+.btn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.25);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.result {
+  font-size: 18px;
+  margin-top: 8px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* HISTORY MODAL */
+#historyBox {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+#historyContent {
+  width: 90%;
+  max-width: 600px;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.history-item {
+  background: #efefef;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <h2>Unit Converter</h2>
+
+  <button class="btn" id="showHistory">History</button>
+
+  <div class="toggle" id="themeBtn">
+    <div class="knob" id="knob"></div>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- Temperature -->
+  <div class="card">
+    <h3>Temperature</h3>
+    <input type="number" id="tempIn" placeholder="Enter value">
+    <select id="tempSel">
+      <option value="C">Celsius</option>
+      <option value="F">Fahrenheit</option>
+      <option value="K">Kelvin</option>
+    </select>
+    <button class="btn" id="tempConvert">Convert</button>
+    <div class="result" id="tempOut">Result: —</div>
+  </div>
+
+  <!-- Weight -->
+  <div class="card">
+    <h3>Weight</h3>
+    <input type="number" id="weightIn" placeholder="Enter value">
+    <select id="weightSel">
+      <option value="kg">Kilogram</option>
+      <option value="g">Gram</option>
+      <option value="lb">Pound</option>
+      <option value="oz">Ounce</option>
+    </select>
+    <button class="btn" id="weightConvert">Convert</button>
+    <div class="result" id="weightOut">Result: —</div>
+  </div>
+
+  <!-- Length -->
+  <div class="card">
+    <h3>Length</h3>
+    <input type="number" id="lengthIn" placeholder="Enter value">
+    <select id="lengthSel">
+      <option value="m">Meter</option>
+      <option value="cm">Centimeter</option>
+      <option value="km">Kilometer</option>
+      <option value="mi">Mile</option>
+      <option value="ft">Foot</option>
+      <option value="in">Inch</option>
+    </select>
+    <button class="btn" id="lengthConvert">Convert</button>
+    <div class="result" id="lengthOut">Result: —</div>
+  </div>
+
+  <!-- Currency -->
+  <div class="card">
+    <h3>Currency</h3>
+    <input type="number" id="currIn" placeholder="Enter value">
+    <select id="currSel">
+      <option value="USD">USD</option>
+      <option value="INR">INR</option>
+      <option value="EUR">EUR</option>
+      <option value="GBP">GBP</option>
+    </select>
+    <button class="btn" id="currConvert">Convert</button>
+    <div class="result" id="currOut">Result: —</div>
+  </div>
+
+</div>
+</div>
+
+<!-- HISTORY POPUP -->
+<div id="historyBox">
+  <div id="historyContent">
+    <h3>History</h3>
+    <div id="historyList"></div>
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+      <button class="btn" id="clearHistory">Clear</button>
+      <button class="btn" id="closeHistory">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== THEME SWITCH ====== */
+let mode = 0;
+const knob = document.getElementById("knob");
+
+document.getElementById("themeBtn").onclick = () => {
+  mode = (mode + 1) % 3;
+
+  if (mode === 0) {
+    document.documentElement.style.setProperty("--bg1", "#00eaff");
+    document.documentElement.style.setProperty("--bg2", "#0061ff");
+    document.documentElement.style.setProperty("--text", "#1b1b1f");
+    knob.style.transform = "translateX(0)";
+  }
+  else if (mode === 1) {
+    document.documentElement.style.setProperty("--bg1", "#ff6fd8");
+    document.documentElement.style.setProperty("--bg2", "#3813c2");
+    document.documentElement.style.setProperty("--text", "white");
+    knob.style.transform = "translateX(30px)";
+  }
+  else {
+    document.documentElement.style.setProperty("--bg1", "#141E30");
+    document.documentElement.style.setProperty("--bg2", "#243B55");
+    document.documentElement.style.setProperty("--text", "white");
+    knob.style.transform = "translateX(60px)";
+  }
+};
+
+/* ====== HISTORY FUNCTIONS ====== */
+function addHistory(text){
+  let h = JSON.parse(localStorage.getItem("HISTORY") || "[]");
+  h.unshift(text);
+  localStorage.setItem("HISTORY", JSON.stringify(h));
+}
+
+document.getElementById("showHistory").onclick = () => {
+  let h = JSON.parse(localStorage.getItem("HISTORY") || "[]");
+  
+  historyList.innerHTML = h.length 
+    ? h.map(x => `<div class="history-item">${x}</div>`).join("")
+    : "<div>No history yet</div>";
+
+  historyBox.style.display = "flex";
+};
+
+document.getElementById("closeHistory").onclick = () => {
+  historyBox.style.display = "none";
+};
+
+document.getElementById("clearHistory").onclick = () => {
+  localStorage.removeItem("HISTORY");
+  historyList.innerHTML = "<div>History cleared</div>";
+};
+
+/* ====== CONVERSIONS ====== */
+function round(v){ return Math.round(v*10000)/10000; }
+
+/* Temperature */
+tempConvert.onclick = () => {
+  let v = parseFloat(tempIn.value);
+  let u = tempSel.value;
+  let r = (u=="C")?v : (u=="F")? (v-32)*5/9 : v-273.15;
+  tempOut.textContent = "Result: " + round(r) + " C";
+  addHistory(`Temperature: ${v} ${u} → ${round(r)} C`);
+};
+
+/* Weight */
+weightConvert.onclick = () => {
+  let v=parseFloat(weightIn.value);
+  let u=weightSel.value;
+  const F={kg:1,g:0.001,lb:0.453592,oz:0.0283495};
+  let r=v*F[u];
+  weightOut.textContent="Result: "+round(r)+" kg";
+  addHistory(`Weight: ${v} ${u} → ${round(r)} kg`);
+};
+
+/* Length */
+lengthConvert.onclick = () => {
+  let v=parseFloat(lengthIn.value);
+  let u=lengthSel.value;
+  const F={m:1,cm:0.01,km:1000,mi:1609,ft:0.3048,in:0.0254};
+  let r=v*F[u];
+  lengthOut.textContent="Result: "+round(r)+" m";
+  addHistory(`Length: ${v} ${u} → ${round(r)} m`);
+};
+
+/* Currency */
+currConvert.onclick = () => {
+  let v=parseFloat(currIn.value);
+  let u=currSel.value;
+  const R={USD:1,INR:83,EUR:0.92,GBP:0.79};
+  let r=v/R[u];
+  currOut.textContent="Result: "+r.toFixed(2)+" USD";
+  addHistory(`Currency: ${v} ${u} → ${r.toFixed(2)} USD`);
+};
+</script>
+
+</body>
+</html>
